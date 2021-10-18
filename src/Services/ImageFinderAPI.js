@@ -1,21 +1,9 @@
 import axios from 'axios';
 
-const currentPage = 1;
-const searchQuery = '';
-const baseURL = 'https://pixabay.com/api/';
-const params = '&image_type=photo';
-const APIKey = '23096925-d42719920a727f8342c46883c';
-
-export default function fetchImages(
-  searchQuery,
-  baseURL,
-  currentPage,
-  params,
-  APIKey,
-) {
+export function fetchPictures(inputValue, baseApi, myApiKey, page) {
   return axios
     .get(
-      `${baseURL}?key=${APIKey}&q=${searchQuery}&${params}&page=${currentPage}&per_page=12`,
+      `${baseApi}?q=${inputValue}&page=${page}&key=${myApiKey}&image_type=photo&orientation=horizontal&per_page=12`,
     )
-    .then(res => res.data.hits);
+    .then(r => r.data.hits);
 }

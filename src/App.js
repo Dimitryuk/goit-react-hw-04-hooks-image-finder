@@ -1,37 +1,26 @@
-import './App.css';
-import ImageGallery from './ImageGallery/ImageGallery';
-import React, { PureComponent } from 'react';
-import Container from './Container/Container';
-import fetchImages from './Services/ImageFinderAPI';
-import SearchBar from './SearchBar/SearchBar';
+import { Component } from 'react';
+import Searchbar from './SearchBar/SearchBar.jsx';
+import ImageGallery from './ImageGallery/ImageGallery.jsx';
+import Container from './Container/Container.jsx';
 
-export default class App extends React.Component {
+export default class App extends Component {
   state = {
-    hits: null,
+    loading: false,
     inputValue: '',
   };
+
   handleFormSubmit = inputValue => {
-    console.log(inputValue);
-    if (this.state.inputValue.trim() === '') {
-      alert('введите запрос');
-      return;
-    }
     this.setState({ inputValue });
   };
-  componentDidMount() {
-    fetch(
-      'https://pixabay.com/api/?key=23096925-d42719920a727f8342c46883c&q=yellow+flowers&image_type=photo',
-    )
-      .then(res => res.json)
-      .then(hits => this.setState({ hits }));
-  }
-  //other logic
+
   render() {
     return (
-      <Container>
-        {this.state.hits && <div>Тут будет отрисовка </div>}
-        <SearchBar onSubmit={this.handleFormSubmit} />
-      </Container>
+      <div className="App">
+        <Container>
+          <Searchbar onSubmit={this.handleFormSubmit} />
+          <ImageGallery inputValue={this.state.inputValue} />
+        </Container>
+      </div>
     );
   }
 }
