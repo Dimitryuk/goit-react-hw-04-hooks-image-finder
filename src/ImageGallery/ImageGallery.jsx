@@ -5,6 +5,7 @@ import Button from '../Button/Button';
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 import Loader from '../Loader/Loader.jsx';
 import Modal from '../ModalWindow/ModalWindow';
+import scrollToBottom from '../scroll/scroll'
 
 export default class ImageGallery extends Component {
   state = {
@@ -18,29 +19,38 @@ export default class ImageGallery extends Component {
     status: 'idle',
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    const { baseApi, myApiKey, page } = this.state;
+ 
+componentDidUpdate(prevProps, prevState) {
+    const { baseApi, myApiKey, page,  } = this.state;
     const prevInputValue = prevProps.inputValue;
     const nextInputValue = this.props.inputValue;
     const prevPage = prevState.page;
     const nextPage = this.state.page;
 
-    if (prevInputValue !== nextInputValue || prevPage !== nextPage) {
-      this.setState({ status: 'pending' });
+    if (prevInputValue !== nextInputValue) {
+      this.setState({ status: "pending" });
+      this.setState({ pictures: [] });
 
       fetchPictures(nextInputValue, baseApi, myApiKey, page)
-        .then(pictures => {
+        .then((pictures) => {
           if (pictures.length === 0) {
-            return this.setState({ status: 'rejected' });
+            return this.setState({ status: "rejected" });
           }
-
           this.getPictures(pictures);
         })
-        .then(this.setState({ status: 'resolved' }))
-        .catch(error => this.setState({ error, status: 'rejected' }));
-    }
-  }
+        .then(this.setState({ status: "resolved" }))
+        .catch((error) => this.setState({ error, status: "rejected" }));
+    } else if (prevPage !== nextPage) {
+      this.setState({ status: "pending" });
 
+      fetchPictures(nextInputValue, baseApi, myApiKey, page)
+        .then((pictures) => this.getPictures(pictures))
+        .then(this.setState({ status: "resolved" })).then(()=>{scrollToBottom()})
+        
+        .catch((error) => this.setState({ error, status: "rejected" }));
+  }
+  
+  }
   getPictures = array => {
     const newArr = array.map(picture => {
       return {
@@ -51,13 +61,10 @@ export default class ImageGallery extends Component {
     });
 
     this.setState({
-      pictures: [...newArr],
+      pictures: [...this.state.pictures,...newArr],
     });
 
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'smooth',
-    });
+    
   };
 
   onLoadMoreClick = () => {
@@ -72,20 +79,20 @@ export default class ImageGallery extends Component {
     }));
   };
 
-  takeModalPicture = url => {
+  loadModalPicture = url => {
     this.setState({ largeUrl: url, showModal: true });
   };
 
   render() {
     const { pictures, status, showModal, largeUrl } = this.state;
-    const { takeModalPicture, toggleModal, onLoadMoreClick } = this;
-    // const { inputValue } = this.props;
+    const { loadModalPicture, toggleModal, onLoadMoreClick } = this;
+    
 
     if (status === 'idle') {
       return <div className="startPage">Enter Something</div>;
     }
     if (status === 'pending') {
-      return <Loader />;
+      return <Loader/>;
     }
     if (status === 'rejected') {
       return (
@@ -97,22 +104,24 @@ export default class ImageGallery extends Component {
     if (status === 'resolved') {
       return (
         <div>
+         
           <ul className="ImageGallery">
             {pictures.map(picture => (
               <ImageGalleryItem
                 key={picture.id}
                 webformatURL={picture.webformatURL}
                 largeImageURL={picture.largeImageURL}
-                onOpen={takeModalPicture}
+                onOpen={loadModalPicture}
               />
             ))}
           </ul>
           {showModal && (
-            <Modal onClose={toggleModal}>
+            <Modal className= 'modalwdw' onClose={toggleModal}>
               <img src={largeUrl} alt="modal-img" />
-              <button type="button" onClick={toggleModal}>
+              {/* <button type="button" onClick={toggleModal}>
                 Close Modal
-              </button>
+              </button> */}
+              <Loader/>
             </Modal>
           )}
           <Button onLoadMoreClick={onLoadMoreClick} />
