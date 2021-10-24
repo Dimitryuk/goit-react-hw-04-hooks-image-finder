@@ -111,3 +111,7 @@ export default function ImageGallery({ inputValue }) {
     );
   }
 }
+
+ImageGallery.propTypes = {
+  inputValue: PropTypes.string,
+};
