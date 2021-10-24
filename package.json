@@ -1,6 +1,6 @@
 {
-  "name": "goit-react-hw-03-image-finder",
-  "homepage": "https://dimitryuk.github.io/goit-react-hw-03-image-finder/",
+  "name": "goit-react-hw-04-hooks-image-finder",
+  "homepage": "https://dimitryuk.github.io/goit-react-hw-04-hooks-image-finder/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
